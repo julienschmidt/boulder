@@ -24,7 +24,7 @@ import (
 	blog "github.com/letsencrypt/boulder/log"
 )
 
-type logDescription struct {
+type LogDescription struct {
 	ID        []byte
 	URI       string
 	PublicKey *ecdsa.PublicKey
@@ -35,7 +35,7 @@ type rawLogDescription struct {
 	PublicKey string `json:"key"`
 }
 
-func (logDesc *logDescription) UnmarshalJSON(data []byte) error {
+func (logDesc *LogDescription) UnmarshalJSON(data []byte) error {
 	var rawLogDesc rawLogDescription
 	if err := json.Unmarshal(data, &rawLogDesc); err != nil {
 		return fmt.Errorf("Failed to unmarshal log description, %s", err)
@@ -71,7 +71,7 @@ func (logDesc *logDescription) UnmarshalJSON(data []byte) error {
 
 // CTConfig defines the JSON configuration file schema
 type CTConfig struct {
-	Logs              []logDescription `json:"logs"`
+	Logs              []LogDescription `json:"logs"`
 	SubmissionRetries int              `json:"submissionRetries"`
 	// This should use the same method as the DNS resolver
 	SubmissionBackoffString string        `json:"submissionBackoff"`
@@ -135,7 +135,8 @@ func (pub *PublisherAuthorityImpl) SubmitToCT(cert *x509.Certificate) error {
 		return nil
 	}
 	submission := ctSubmissionRequest{Chain: []string{base64.StdEncoding.EncodeToString(cert.Raw)}}
-	// Add all intermediate/root certificates needed for submission
+	// Add all intermediate/root certificates needed for submission (this bundle
+	// can be created using boulder-gen-ct-bundle)
 	submission.Chain = append(submission.Chain, pub.CT.IssuerBundle...)
 	client := http.Client{}
 	jsonSubmission, err := json.Marshal(submission)
@@ -262,7 +263,7 @@ func (pub *PublisherAuthorityImpl) SubmitToCT(cert *x509.Certificate) error {
 
 func postJSON(client *http.Client, uri string, data []byte, respObj interface{}) (*http.Response, error) {
 	if !strings.HasPrefix(uri, "http://") && !strings.HasPrefix(uri, "https://") {
-		uri = fmt.Sprintf("%s%s", "http://", uri)
+		uri = fmt.Sprintf("%s%s", "https://", uri)
 	}
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(data))
 	if err != nil {

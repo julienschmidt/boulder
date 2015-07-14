@@ -12,6 +12,7 @@ OBJECTS = activity-monitor \
 	boulder-va \
 	boulder-wfe \
 	boulder-publisher \
+	boulder-gen-ct-bundle \
 	ocsp-updater \
 	ocsp-responder
 
