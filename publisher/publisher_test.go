@@ -140,7 +140,7 @@ func TestNewPublisherAuthorityImpl(t *testing.T) {
 	_, err := NewPublisherAuthorityImpl(&ctConf)
 	test.AssertNotError(t, err, "Couldn't create new PublisherAuthority")
 
-	ctConf = CTConfig{Logs: []logDescription{logDescription{URI: "http://localhost:8080/ct/v1/add-chain"}}, SubmissionBackoffString: "0s"}
+	ctConf = CTConfig{Logs: []LogDescription{LogDescription{URI: "http://localhost:8080/ct/v1/add-chain"}}, SubmissionBackoffString: "0s"}
 	_, err = NewPublisherAuthorityImpl(&ctConf)
 	test.AssertNotError(t, err, "Couldn't create new PublisherAuthority")
 }
@@ -176,7 +176,7 @@ func TestSubmitToCT(t *testing.T) {
 
 	intermediatePEM, _ := pem.Decode([]byte(testIntermediate))
 
-	pub, err := NewPublisherAuthorityImpl(&CTConfig{Logs: []logDescription{logDescription{URI: "http://localhost:8080/ct/v1/add-chain"}}, SubmissionBackoffString: "0s"})
+	pub, err := NewPublisherAuthorityImpl(&CTConfig{Logs: []LogDescription{LogDescription{URI: "http://localhost:8080/ct/v1/add-chain"}}, SubmissionBackoffString: "0s"})
 	pub.CT.IssuerBundle = append(pub.CT.IssuerBundle, base64.StdEncoding.EncodeToString(intermediatePEM.Bytes))
 	pub.SA = &mocks.MockSA{}
 	test.AssertNotError(t, err, "Couldn't create new PublisherAuthority")
